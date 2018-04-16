@@ -1,0 +1,79 @@
+version: '2.2'
+
+services:
+
+  kong-db:
+    image: postgres:9-alpine
+#    container_name: kong-db
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_DB: kongdb
+      POSTGRES_PASSWORD: MenUVYe7TJDcqOUEbZ2PZ1K5RP8FfMBP
+#    healthcheck:
+#      test: "pg_isready -U kong && psql -d kong -U kong -c \"SELECT 1=1\""
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+    ports:
+      - 5432:5432
+
+  kong-setup:
+    image: kong:latest
+    links:
+      - kong-db
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-db
+    command: kong migrations up
+
+#  kong-migration:
+#    image: kong:latest
+#    container_name: kong-migration
+#    depends_on:
+#      kong-db:
+#        condition: service_healthy
+#    environment:
+#      - KONG_DATABASE=postgres
+#      - KONG_PG_HOST=kong-db
+#    command: sh -c "kong migrations up && touch migrations_run && sleep 30"
+#    healthcheck:
+#      test: "if [[ -f migrations_run ]] ; then exit 0; else exit 1; fi"
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+
+  kong:
+    image: kong:latest
+#    container_name: kong
+#    depends_on:
+#      kong-migration:
+#        condition: service_healthy
+#    healthcheck:
+#      test: "kong health"
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-db
+      KONG_PROXY_ACCESS_LOG: "/dev/stdout"
+      KONG_ADMIN_ACCESS_LOG: "/dev/stdout"
+      KONG_PROXY_ERROR_LOG: "/dev/stderr"
+      KONG_ADMIN_ERROR_LOG: "/dev/stderr"
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001"
+      KONG_ADMIN_LISTEN_SSL: "0.0.0.0:8444"
+    ports:
+      - 8000:8000
+      - 8443:8443
+      - 8001:8001
+      - 8444:8444
+    links:
+      - kong-db
+
+  kong-dashboard:
+    image: 48ddfbcf3814
+    ports:
+      - 8080:8080
+#    depends_on:
+#      kong:
+#        condition: service_healthy
