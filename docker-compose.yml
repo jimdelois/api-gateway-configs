@@ -6,8 +6,8 @@ services:
     image: postgres:9-alpine
 #    container_name: kong-db
     environment:
+      POSTGRES_DB: kong
       POSTGRES_USER: kong
-      POSTGRES_DB: kongdb
       POSTGRES_PASSWORD: MenUVYe7TJDcqOUEbZ2PZ1K5RP8FfMBP
 #    healthcheck:
 #      test: "pg_isready -U kong && psql -d kong -U kong -c \"SELECT 1=1\""
@@ -18,12 +18,15 @@ services:
       - 5432:5432
 
   kong-setup:
-    image: kong:latest
+    image: kong:0.13.0-alpine
     links:
       - kong-db
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: kong-db
+      KONG_PG_DATABASE: kong
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: MenUVYe7TJDcqOUEbZ2PZ1K5RP8FfMBP
     command: kong migrations up
 
 #  kong-migration:
