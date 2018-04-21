@@ -1,6 +1,6 @@
 #!/bin/bash
 yum install -y aws-cli
-aws s3 cp s3://kong-us-east-1-165383265659/ecs.config /etc/ecs/ecs.config
+aws s3 cp s3://kong-us-east-1-165383265659/ecs-konga.config /etc/ecs/ecs.config
 
 # TODO: This is absolutely where Secure Parameters should be called in:
 # https://aws.amazon.com/blogs/compute/managing-secrets-for-amazon-ecs-applications-using-parameter-store-and-iam-roles-for-tasks/
