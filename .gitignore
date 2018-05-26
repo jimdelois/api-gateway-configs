@@ -1,2 +1,2 @@
 .idea
-.aws/cloudformation/kong.stack.parameters.json
+.aws/cloudformation/*.parameters.json
