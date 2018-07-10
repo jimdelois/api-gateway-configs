@@ -2,81 +2,88 @@ version: '2.2'
 
 services:
 
-  kong-db:
+  database:
     image: postgres:9-alpine
 #    container_name: kong-db
     environment:
       POSTGRES_DB: kong
       POSTGRES_USER: kong
       POSTGRES_PASSWORD: MenUVYe7TJDcqOUEbZ2PZ1K5RP8FfMBP
-#    healthcheck:
-#      test: "pg_isready -U kong && psql -d kong -U kong -c \"SELECT 1=1\""
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
+    healthcheck:
+      test: "pg_isready -U kong && psql -d kong -U kong -c \"SELECT 1=1\""
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
-      - 5432:5432
+    - 5432:5432
+    network_mode: bridge
 
-  kong-setup:
-    image: kong:0.13.0-alpine
+  kong-migrate:
+    image: kong:0.14.0-alpine
+    depends_on:
+      database:
+        condition: service_healthy
     links:
-      - kong-db
+    - database
     environment:
       KONG_DATABASE: postgres
-      KONG_PG_HOST: kong-db
+      KONG_PG_HOST: database
       KONG_PG_DATABASE: kong
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: MenUVYe7TJDcqOUEbZ2PZ1K5RP8FfMBP
     command: kong migrations up
-
-#  kong-migration:
-#    image: kong:latest
-#    container_name: kong-migration
-#    depends_on:
-#      kong-db:
-#        condition: service_healthy
-#    environment:
-#      - KONG_DATABASE=postgres
-#      - KONG_PG_HOST=kong-db
-#    command: sh -c "kong migrations up && touch migrations_run && sleep 30"
-#    healthcheck:
-#      test: "if [[ -f migrations_run ]] ; then exit 0; else exit 1; fi"
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
+    network_mode: bridge
 
   kong:
-    image: kong:latest
+    image: kong:0.14.0-alpine
 #    container_name: kong
-#    depends_on:
-#      kong-migration:
-#        condition: service_healthy
-#    healthcheck:
-#      test: "kong health"
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: "kong health"
+      interval: 10s
+      timeout: 5s
+      retries: 5
     environment:
       KONG_DATABASE: postgres
-      KONG_PG_HOST: kong-db
+      KONG_PG_HOST: database
+      KONG_PG_DATABASE: kong
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: MenUVYe7TJDcqOUEbZ2PZ1K5RP8FfMBP
       KONG_PROXY_ACCESS_LOG: "/dev/stdout"
       KONG_ADMIN_ACCESS_LOG: "/dev/stdout"
       KONG_PROXY_ERROR_LOG: "/dev/stderr"
       KONG_ADMIN_ERROR_LOG: "/dev/stderr"
       KONG_ADMIN_LISTEN: "0.0.0.0:8001"
-      KONG_ADMIN_LISTEN_SSL: "0.0.0.0:8444"
+#      KONG_ADMIN_LISTEN_SSL: "0.0.0.0:8444"
+      VIRTUAL_HOST: .api.magic8.gateway.local.lan
+      VIRTUAL_PORT: 8000
     ports:
-      - 8000:8000
-      - 8443:8443
-      - 8001:8001
-      - 8444:8444
+    - 8000
+    - 8001
     links:
-      - kong-db
+    - database
+    network_mode: bridge
 
-  kong-dashboard:
-    image: 48ddfbcf3814
+  konga:
+    image: pantsel/konga:konga:0.11.2
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DB_ADAPTER: postgres
+      DB_HOST: database
+      DB_DATABASE: konga
+      DB_USER: kong
+      DB_PASSWORD: MenUVYe7TJDcqOUEbZ2PZ1K5RP8FfMBP
+      VIRTUAL_HOST: .kong.local.lan
+      HTTPS_METHOD: noredirect
+#      NODE_ENV: dev
+      NODE_ENV: production
     ports:
-      - 8080:8080
-#    depends_on:
-#      kong:
-#        condition: service_healthy
+    - 1337
+    links:
+    - kong
+    - database
+    network_mode: bridge
