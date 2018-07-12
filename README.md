@@ -42,23 +42,61 @@ aws cloudformation execute-change-set --change-set-name $CHANGESET_ARN
 
 #### Schema Migrations
 
-To perform DB migrations for the Kong backing store (whether installing a fresh schema or updating an existing one), perform the following:
+Whether installing a fresh schema or updating an existing one, DB migrations will need to be performed for the the Kong and Konga backing stores.
+
+Depending on the configuration, it may be desirable to scale the EC2 group first, ensuring that there is capacity in the cluster for deploying and executing these tasks.
+
+##### Extracting the AutoScaling Group Name
+
+We haven't named our AutoScaling Group so as to avoid resource replacement the need should arise to adjust it.  For this reason, we need to extract the name of the group, which has been dynamically generated.  We can list all the groups and pluck out then one we need (which should be obvious):
 
 ```
+aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[].AutoScalingGroupName"
+```
+
+Or, if we want the lengthier version of pulling out exactly the correct one:
+
+```
+aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[?Tags[?Key == 'aws:cloudformation:logical-id' && contains(Value, 'KongECSInstanceAutoScalingGroup')]].AutoScalingGroupName"
+```
+
+##### Scale the Group Up
+
+```
+$GROUP_NAME=
+aws autoscaling set-desired-capacity --auto-scaling-group-name $GROUP_NAME --desired-capacity 2 --honor-cooldown
+```
+
+Check in on these instances with:
+
+```
+aws ecs list-container-instances --cluster Kong
+```
+
+##### Perform the Migrations
+
+Execute the migrations by performing the following:
+
+```
+#Kong
 aws ecs run-task --cluster kong --task-definition kongmigration --count 1
-```
 
-And now the same for Konga:
-
-```
+# Konga
 aws ecs run-task --cluster kong --task-definition kongamigration --count 1
 ```
 
-Extract the Task ARN from that command and copy it.  This particular migration is performed by running the Konga application in `dev` mode - as such, it will not actually terminate itself and it must be stopped manually:
+Extract the Task ARN from that last command and copy it.  This particular migration is performed by running the Konga application in `dev` mode - as such, it will not actually terminate itself and it must be stopped manually:
 
 ```
 TASK_ARN=
 aws ecs stop-task --cluster kong --task $TASK_ARN --reason "Migrations Completed"
+```
+
+##### Scale the Group Back Down
+
+```
+$GROUP_NAME=
+aws autoscaling set-desired-capacity --auto-scaling-group-name $GROUP_NAME --desired-capacity 1 --honor-cooldown
 ```
 
 
