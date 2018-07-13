@@ -127,7 +127,7 @@ aws cloudformation create-stack --stack-name kong-dashboards --template-body fil
 
 As can be seen in the Stack configs, the Admin API of Kong is tucked away and protected from public access, allowing ingress only from the Konga UI service (which is auth protected by default). However, it is possible to configure the Admin API to be exposed through Kong itself using a [loopback configuration](https://docs.gelato.io/guides/advanced-kong-integration).
 
-Note that the Kong API Gateway makes it possible to import and export configurations.  At the point that the Admin API is exposed (and protected with by tokens, etc), any automated process may import configurations, thus making it possible for a CI/CD pipeline for an actual API application to self-register.  Further, this allows for the storage of API Gateway configuration as code, local to the API's repository.  Alternatively, normal HTTP requests may be sent to the Admin API for configuration, as well.
+Note that the Kong API Gateway makes it possible to import and export configurations.  At the point that the Admin API is exposed (and protected by tokens, etc), any automated process may import configurations, thus making it possible for a CI/CD pipeline for an actual API application to self-register.  Further, this allows for the storage of API Gateway configuration as code, local to the API's repository.  Alternatively, normal HTTP requests may be sent to the Admin API for configuration, as well.
 
 While this is extremely powerful, the strategies and options for it are beyond the scope of this documentation.
 
