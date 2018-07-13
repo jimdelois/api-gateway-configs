@@ -113,6 +113,16 @@ aws cloudformation create-stack --stack-name kong-autoscaling --template-body fi
 
 **TODO:** The Auto-Scaling stack can (and should) be made highly configurable and parameterized.
 
+#### Install Dashboards (Optional)
+
+CloudFormation can manage CloudWatch Dashboards, as well. To keep things reasonably organized and manageable, we separate these into a dedicated stack, as well.  To install:
+
+```
+aws cloudformation create-stack --stack-name kong-dashboards --template-body file://.aws/cloudformation/kong.dashboards.stack.yml
+```
+
+**TODO:** Do.
+
 
 ### Running Locally
 
