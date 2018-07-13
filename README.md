@@ -78,7 +78,7 @@ aws ecs list-container-instances --cluster Kong
 Execute the migrations by performing the following:
 
 ```
-#Kong
+# Kong
 aws ecs run-task --cluster kong --task-definition kongmigration --count 1
 
 # Konga
@@ -98,6 +98,20 @@ aws ecs stop-task --cluster kong --task $TASK_ARN --reason "Migrations Completed
 $GROUP_NAME=
 aws autoscaling set-desired-capacity --auto-scaling-group-name $GROUP_NAME --desired-capacity 1 --honor-cooldown
 ```
+
+#### Install Auto-Scaling Policies (Optional)
+
+Implementing Auto-Scaling in AWS is done by attaching scaling policies to existing resources.  This one-way dependency of the former on the latter allows us to completely decouple the two. Not only does this make Auto-Scaling entirely optional, it also yields smaller and more manageable/targeted CloudFormation Stack files.
+
+This could further be broken down into EC2 Instance Auto-Scaling, and ECS Service Auto-Scaling. For now, both configurations are managed in the same Stack.
+
+To install Auto-Scaling Policies:
+
+```
+aws cloudformation create-stack --stack-name kong-autoscaling --template-body file://.aws/cloudformation/kong.scaling.stack.yml
+```
+
+**TODO:** The Auto-Scaling stack can (and should) be made highly configurable and parameterized.
 
 
 ### Running Locally
