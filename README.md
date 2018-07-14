@@ -63,7 +63,7 @@ aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[?Tags[?K
 ##### Scale the Group Up
 
 ```
-$GROUP_NAME=
+GROUP_NAME=
 aws autoscaling set-desired-capacity --auto-scaling-group-name $GROUP_NAME --desired-capacity 2 --honor-cooldown
 ```
 
@@ -95,7 +95,7 @@ aws ecs stop-task --cluster Kong --task $TASK_ARN --reason "Migrations Completed
 ##### Scale the Group Back Down
 
 ```
-$GROUP_NAME=
+GROUP_NAME=
 aws autoscaling set-desired-capacity --auto-scaling-group-name $GROUP_NAME --desired-capacity 1 --honor-cooldown
 ```
 
