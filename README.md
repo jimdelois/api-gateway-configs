@@ -79,17 +79,17 @@ Execute the migrations by performing the following:
 
 ```
 # Kong
-aws ecs run-task --cluster kong --task-definition kongmigration --count 1
+aws ecs run-task --cluster Kong --task-definition kongmigration --count 1
 
 # Konga
-aws ecs run-task --cluster kong --task-definition kongamigration --count 1
+aws ecs run-task --cluster Kong --task-definition kongamigration --count 1
 ```
 
 Extract the Task ARN from that last command and copy it.  This particular migration is performed by running the Konga application in `dev` mode - as such, it will not actually terminate itself and it must be stopped manually:
 
 ```
 TASK_ARN=
-aws ecs stop-task --cluster kong --task $TASK_ARN --reason "Migrations Completed"
+aws ecs stop-task --cluster Kong --task $TASK_ARN --reason "Migrations Completed"
 ```
 
 ##### Scale the Group Back Down
