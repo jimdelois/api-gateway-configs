@@ -8,21 +8,40 @@ Kong and Konga both provide their own "migrations" management mechanism so an in
 
 ### AWS Installation (CloudFormation)
 
-#### Database
+#### Preparation
+
+##### Configuration Parameter Files
+
+Several of the CloudFormation templates included within this library are parameterized for flexibility and, in some cases, security. Although the CloudFormation templates may be uploaded to the AWS Console and any parameters may be provided there, the recommended approach (and that which is documented here) is to use the AWS CLI tool. For this approach, JSON-formatted files are required to define these parameters during command execution.
+
+This library provides a set of [sample parameter files](.aws/cloudformation/parameters-samples/) to use as a starting point. It is recommended to copy these files into the `.aws/cloudformation/parameters/` directory, which is ignored from this repository. There, they may be modified with your own personal configurations without becoming a part of this repository's commit history.
+
+Alternatively, it may be more convenient to symlink the `parameters` directory to a separate, VCS-managed project.
+
+##### Working Directory
+
+The commands below are shown as executed from the [cloudformation directory](./aws/cloudformation/).
+
+```
+cd .aws/cloudformation/
+```
+
+
+#### Install the Database
 
 Create the database independently, as it is extremely time/resource intensive which may
 impede any modifications to the balance of the stack in the future:
 
 ```
-aws cloudformation create-stack --stack-name kong-database --template-body file://.aws/cloudformation/kong.database.stack.yml --parameters file://.aws/cloudformation/kong.database.stack.parameters.json
+aws cloudformation create-stack --stack-name kong-database --template-body file://kong.database.stack.yml --parameters file://parameters/kong.database.stack.json
 ```
 
-#### Application
+#### Install the Application
 
 Using a reviewable change set, create the rest of the stack which installs and starts the entire application:
 
 ```
-aws cloudformation create-change-set --stack-name kong --change-set-type CREATE --change-set-name InitialRevision --template-body file://.aws/cloudformation/kong.stack.yml --parameters file://.aws/cloudformation/kong.stack.parameters.json
+aws cloudformation create-change-set --stack-name kong --change-set-type CREATE --change-set-name InitialRevision --template-body file://kong.stack.yml --parameters file://parameters/kong.stack.json
 ```
 
 Review the requested change set:
@@ -40,7 +59,7 @@ aws cloudformation execute-change-set --change-set-name $CHANGESET_ARN
 
 **NOTE**: It's possible that the application will thrash a bit if the migrations haven't been run, as it will detect invalid schemas and shut down. Run the migrations, below, and monitor for eventual stability.
 
-#### Schema Migrations
+#### Run the Schema Migrations
 
 Whether installing a fresh schema or updating an existing one, DB migrations will need to be performed for the the Kong and Konga backing stores.
 
@@ -99,7 +118,7 @@ GROUP_NAME=
 aws autoscaling set-desired-capacity --auto-scaling-group-name $GROUP_NAME --desired-capacity 1 --honor-cooldown
 ```
 
-#### Install Auto-Scaling Policies (Optional)
+#### Install the Auto-Scaling Policies (Optional)
 
 Implementing Auto-Scaling in AWS is done by attaching scaling policies to existing resources.  This one-way dependency of the former on the latter allows us to completely decouple the two. Not only does this make Auto-Scaling entirely optional, it also yields smaller and more manageable/targeted CloudFormation Stack files.
 
@@ -108,7 +127,7 @@ This could further be broken down into EC2 Instance Auto-Scaling and ECS Service
 To install Auto-Scaling Policies:
 
 ```
-aws cloudformation create-stack --stack-name kong-autoscaling --template-body file://.aws/cloudformation/kong.scaling.stack.yml
+aws cloudformation create-stack --stack-name kong-autoscaling --template-body file://kong.scaling.stack.yml
 ```
 
 **TODO:** The Auto-Scaling stack can (and should) be made highly configurable and parameterized.
@@ -118,7 +137,7 @@ aws cloudformation create-stack --stack-name kong-autoscaling --template-body fi
 CloudFormation can manage CloudWatch Dashboards, as well. To keep things reasonably organized and manageable, we separate these into a dedicated stack, as well.  To install:
 
 ```
-aws cloudformation create-stack --stack-name kong-dashboards --template-body file://.aws/cloudformation/kong.dashboards.stack.yml
+aws cloudformation create-stack --stack-name kong-dashboards --template-body file://kong.dashboards.stack.yml
 ```
 
 **TODO:** Do.
