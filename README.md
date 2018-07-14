@@ -12,7 +12,7 @@ Kong and Konga both provide their own "migrations" management mechanism so an in
 
 ##### Configuration Parameter Files
 
-Several of the CloudFormation templates included within this library are parameterized for flexibility and, in some cases, security. Although the CloudFormation templates may be uploaded to the AWS Console and any parameters may be provided there, the recommended approach (and that which is documented here) is to use the AWS CLI tool. For this approach, JSON-formatted files are required to define these parameters during command execution.
+Several of the CloudFormation templates included within this library are parameterized for flexibility and, in some cases, security. Although the CloudFormation templates may be uploaded to the AWS Console and any parameters may be provided there, the recommended approach (and that which is documented here) is to use the AWS CLI tool. For this method, JSON-formatted files are required to define these parameters during command execution.
 
 This library provides a set of [sample parameter files](.aws/cloudformation/parameters-samples/) to use as a starting point. It is recommended to copy these files into the `.aws/cloudformation/parameters/` directory, which is ignored from this repository. There, they may be modified with your own personal configurations without becoming a part of this repository's commit history.
 
@@ -20,7 +20,7 @@ Alternatively, it may be more convenient to symlink the `parameters` directory t
 
 ##### Working Directory
 
-The commands below are shown as executed from the [cloudformation directory](./aws/cloudformation/).
+The commands below are shown as executed from the [cloudformation directory](.aws/cloudformation/).
 
 ```
 cd .aws/cloudformation/
