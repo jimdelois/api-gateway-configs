@@ -1,4 +1,13 @@
+**NOTE:** This repository will eventually contain configurations for other OSS Gateways (such as [Gravitee](https://gravitee.io/), [API Umbrella](https://apiumbrella.io/), etc).  [Kong](https://konghq.com/kong/) is currently the only configured Gateway at this time and, thus, remains at the root of the project. This repository will be re-organized once additional Gateways are added.
+
 # Kong
+
+## Overview
+
+The AWS CloudFormation configuration in this repository is capable of providing the following infrastructure:
+
+![Kong AWS Infrastructure](./aws/Kong-Application-Diagram.png)
+*Some elements omitted*
 
 ## Setup / Deployment
 
