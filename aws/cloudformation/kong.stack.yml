@@ -310,7 +310,7 @@ Resources:
           Value: !Ref DatabasePassword
         - Name: "NODE_ENV"
           Value: "production"
-        Image: "pantsel/konga:0.11.2"
+        Image: "pantsel/konga:0.14.9"
         Links:
         - "kongadmin:kongadmin"
         MemoryReservation: 200
@@ -406,7 +406,7 @@ Resources:
           Value: !Ref DatabasePassword
         - Name: "NODE_ENV"
           Value: "dev"
-        Image: "pantsel/konga:0.11.2"
+        Image: "pantsel/konga:0.14.9"
         MemoryReservation: 256
         Name: "kongamigration"
         LogConfiguration:
