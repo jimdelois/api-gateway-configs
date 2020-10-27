@@ -278,7 +278,7 @@ Resources:
           Value: "/dev/stdout"
         - Name: "KONG_PROXY_ERROR_LOG"
           Value: "/dev/stderr"
-        Image: "kong:0.14.0-alpine"
+        Image: "kong:2.1.4-alpine"
         MemoryReservation: 400
         Name: "kong"
         PortMappings:
@@ -310,7 +310,7 @@ Resources:
           Value: !Ref DatabasePassword
         - Name: "NODE_ENV"
           Value: "production"
-        Image: "pantsel/konga:0.11.2"
+        Image: "pantsel/konga:0.14.9"
         Links:
         - "kongadmin:kongadmin"
         MemoryReservation: 200
@@ -342,7 +342,7 @@ Resources:
           Value: "/dev/stderr"
         - Name: "KONG_ADMIN_LISTEN"
           Value: "0.0.0.0:8001"
-        Image: "kong:0.14.0-alpine"
+        Image: "kong:2.1.4-alpine"
         MemoryReservation: 200
         Name: "kongadmin"
         PortMappings:
@@ -376,8 +376,8 @@ Resources:
           Value: "/dev/stdout"
         - Name: "KONG_PROXY_ERROR_LOG"
           Value: "/dev/stderr"
-        Image: "kong:0.14.0-alpine"
-        Command: [ "kong", "migrations", "up" ]
+        Image: "kong:2.1.4-alpine"
+        Command: [ "kong", "migrations", "bootstrap" ]
         MemoryReservation: 256
         Name: "kongmigration"
         LogConfiguration:
@@ -406,7 +406,7 @@ Resources:
           Value: !Ref DatabasePassword
         - Name: "NODE_ENV"
           Value: "dev"
-        Image: "pantsel/konga:0.11.2"
+        Image: "pantsel/konga:0.14.9"
         MemoryReservation: 256
         Name: "kongamigration"
         LogConfiguration:
