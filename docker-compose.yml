@@ -19,7 +19,7 @@ services:
     network_mode: bridge
 
   kong-migrate:
-    image: kong:0.14.0-alpine
+    image: kong:2.1.4-alpine
     depends_on:
       database:
         condition: service_healthy
@@ -35,7 +35,7 @@ services:
     network_mode: bridge
 
   kong:
-    image: kong:0.14.0-alpine
+    image: kong:2.1.4-alpine
 #    container_name: kong
     depends_on:
       database:
